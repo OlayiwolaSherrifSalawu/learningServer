@@ -45,6 +45,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	
 	err = os.WriteFile("user.json", js, 0644)
 	if err != nil {
 		fmt.Println(err)
