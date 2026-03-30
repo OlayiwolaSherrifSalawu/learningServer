@@ -12,9 +12,10 @@ type Store interface {
 }
 
 type Task struct {
-	ID         int    `json:"id"`
-	TITLE      string `json:"title"`
-	IsComplete bool   `json:"isComplete"`
+	ID          int    `json:"id"`
+	TITLE       string `json:"title"`
+	DESCRIPTION string `json:"description"`
+	IsComplete  bool   `json:"isComplete"`
 }
 type Logger struct{}
 
@@ -45,7 +46,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	
+
 	err = os.WriteFile("user.json", js, 0644)
 	if err != nil {
 		fmt.Println(err)
