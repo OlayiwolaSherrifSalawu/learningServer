@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -14,6 +15,12 @@ func main() {
 	for _, val := range resp.Header {
 		fmt.Println(val)
 	}
-	fmt.Printf("%v\n", resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(resp.Status)
+	fmt.Printf("%s\n", body)
 	resp.Body.Close()
 }
