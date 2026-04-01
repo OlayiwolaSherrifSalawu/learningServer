@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	resp, err := http.Get("http://localhost:8080/")
+	resp, err := http.Get("http://localhost:8080/?id=38")
 	if err != nil {
 		fmt.Println(err)
 		return
