@@ -9,6 +9,9 @@ import (
 	"strconv"
 )
 
+type Application struct {
+	store *Store
+}
 type Task struct {
 	Id          string `json:"id"`
 	Title       string `json:"title"`
@@ -18,6 +21,10 @@ type Task struct {
 
 type Store map[int]Task
 
+func (app *Application) handleTask(w http.ResponseWriter, r *http.Request) {
+task:= app.store[]
+}
+
 func (s *Store) readJson(fileName string) error {
 	file, err := os.ReadFile(fileName)
 	if err != nil {
@@ -26,7 +33,6 @@ func (s *Store) readJson(fileName string) error {
 
 	err = json.Unmarshal(file, s)
 	if err != nil {
-		fmt.Println("afang")
 		return err
 	}
 	return nil
@@ -48,17 +54,10 @@ func (s *Store) getJson(id int, fileName string) ([]byte, error) {
 	return byts, nil
 }
 func task(w http.ResponseWriter, r *http.Request) {
-	var s Store
-	err := s.readJson("result.json")
-	if err != nil {
-		w.WriteHeader(500)
-		w.Header().Add("Allow", "Error reading file")
-		w.Write([]byte("server error while reading file "))
-		return
-	}
+
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
-		w.WriteHeader(501)
+		w.WriteHeader(405)
 		w.Write([]byte("method not allowed"))
 		return
 	}
@@ -72,14 +71,8 @@ func task(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// data, err := json.Marshal(file)
-	file, err := s.getJson(id, "result.json")
-	if err != nil {
-		w.Write([]byte("something went wrong"))
-		return
-	}
-
-	w.Write(file)
+	// data, err := json.Marshal(file
+	// w.Write(file)
 }
 
 func main() {
