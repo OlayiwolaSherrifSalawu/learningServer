@@ -10,7 +10,13 @@ import (
 
 func Home(w http.ResponseWriter, r *http.Request) {
 
-	ts, err := template.ParseFiles("ui/html/home.page.tmpl")
+	files := []string{
+		"ui/html/home.page.tmpl",
+		"ui/html/base.layout.tmpl",
+		"ui/html/footer.partail.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
 
 	if err != nil {
 		log.Println(err.Error())
