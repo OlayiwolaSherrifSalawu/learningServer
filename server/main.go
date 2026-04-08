@@ -67,7 +67,55 @@ func (app *Application) handleTask(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(byts)
 }
+func (app *Application) createTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", "only post methods allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("only post method allowed"))
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, 104567)
+	count := 0
+	for _, val := range *app.store {
+		if val.Id >= count {
+			count = val.Id
+		}
+	}
+	count += 1
+	newTask := (*app.store)[count]
 
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&newTask); err != nil {
+		http.Error(w, "error decoding the message", http.StatusBadRequest)
+		return
+	}
+	newTask.Id = count
+
+	err := json.NewEncoder(w).Encode(newTask)
+	if err != nil {
+		http.Error(w, "error encoding the message", http.StatusBadRequest)
+		return
+	}
+	(*app.store)[count] = newTask
+	app.store.writeJson(app.fileName)
+}
+
+func (s Store) writeJson(fileName string) error {
+	var theStore []Task
+	for _, val := range s {
+		theStore = append(theStore, val)
+	}
+
+	byts, err := json.Marshal(theStore)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(fileName, byts, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func main() {
 	var temp []Task
 	theStore := &Store{}
@@ -78,10 +126,12 @@ func main() {
 	}
 	theStore.unmarsha(fileByte, &temp)
 	app := &Application{
-		store: theStore,
+		store:    theStore,
+		fileName: "result.json",
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.handleTask)
+	mux.HandleFunc("GET /", app.handleTask)
+	mux.HandleFunc("POST /", app.createTask)
 	log.Println("server started at port 8080")
 	errs := http.ListenAndServe(":8080", mux)
 	log.Fatal(errs)

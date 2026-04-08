@@ -23,4 +23,5 @@ func main() {
 	fmt.Println(resp.Status)
 	fmt.Printf("%s\n", body)
 	resp.Body.Close()
+
 }
