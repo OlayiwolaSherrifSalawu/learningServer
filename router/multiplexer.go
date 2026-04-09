@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -75,5 +76,38 @@ func (app *Application) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	(*app.Store)[count] = newTask
+	app.Store.WriteJson(app.FileName)
+}
+
+func (app *Application) UpdateTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		w.Header().Set("Allow", "only Put method Allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("method not allowed"))
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, 104567)
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Id not found"))
+		fmt.Println(err)
+		return
+	}
+	taskToUpdate, ok := (*app.Store)[id]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("ID not found "))
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	if err = decoder.Decode(&taskToUpdate); err != nil {
+		http.Error(w, "error while decoding", http.StatusBadRequest)
+		return
+	}
+	taskToUpdate.Id = id
+	json.NewEncoder(w).Encode(taskToUpdate)
+	(*app.Store)[id] = taskToUpdate
 	app.Store.WriteJson(app.FileName)
 }
