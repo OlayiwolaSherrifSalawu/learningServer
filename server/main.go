@@ -23,6 +23,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", app.HandleTask)
 	mux.HandleFunc("POST /", app.CreateTask)
+	mux.HandleFunc("PUT /", app.UpdateTask)
+	mux.HandleFunc("DELETE /", app.DeleteTask)
 	log.Println("server started at port 8080")
 	errs := http.ListenAndServe(":8080", mux)
 	log.Fatal(errs)

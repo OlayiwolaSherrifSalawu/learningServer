@@ -48,7 +48,7 @@ func (app *Application) HandleTask(w http.ResponseWriter, r *http.Request) {
 }
 func (app *Application) CreateTask(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", "only post methods allowed")
+		w.Header().Set("Allow", "POST")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("only post method allowed"))
 		return
@@ -81,7 +81,7 @@ func (app *Application) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 func (app *Application) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPut {
-		w.Header().Set("Allow", "only Put method Allowed")
+		w.Header().Set("Allow", "PUT")
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("method not allowed"))
 		return
@@ -109,5 +109,30 @@ func (app *Application) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	taskToUpdate.Id = id
 	json.NewEncoder(w).Encode(taskToUpdate)
 	(*app.Store)[id] = taskToUpdate
+
+	app.Store.WriteJson(app.FileName)
+}
+
+func (app *Application) DeleteTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		w.Header().Set("Allow", "Only DELETE")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("Only Delete Method Allowed"))
+		return
+	}
+
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(" id not allowed "))
+		return
+	}
+	_, ok := (*app.Store)[id]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(" id not allowed cant find id to delete"))
+		return
+	}
+	delete((*app.Store), id)
 	app.Store.WriteJson(app.FileName)
 }
