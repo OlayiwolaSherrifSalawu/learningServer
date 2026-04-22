@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"alexedwards.net/snippetbox/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -17,6 +18,7 @@ type Config struct {
 type Application struct {
 	ErrorLoger *log.Logger
 	InfoLogger *log.Logger
+	snippet    *mysql.SnippetModel
 }
 
 func main() {
@@ -37,6 +39,7 @@ func main() {
 		ErrorLog: app.ErrorLoger,
 	}
 	app.InfoLogger.Printf("Starting server on %s", cfg.Addr)
+	app.snippet = &mysql.SnippetModel{DB: db}
 	err = serve.ListenAndServe()
 	serve.ErrorLog.Fatal(err)
 
