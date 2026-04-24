@@ -1,10 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
+
+	"alexedwards.net/snippetbox/pkg/models"
 )
 
 func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
@@ -33,14 +37,36 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+
+	late, err := app.snippet.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	for _, val := range late {
+		fmt.Fprintf(w, "%v", val)
+	}
 }
 func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	log.Println(id, err)
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
+
+	snippet, err := app.snippet.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecods) {
+			app.notFound(w)
+			return
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	fmt.Fprintf(w, "%v", snippet)
 }
 func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -49,9 +75,9 @@ func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n– Kobayashi Issa"
-	expires := "7"
+	title := "Ola test"
+	content := "Afang at night "
+	expires := "3"
 
 	id, err := app.snippet.Insert(title, content, expires)
 	if err != nil {
