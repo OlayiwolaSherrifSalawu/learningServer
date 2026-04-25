@@ -58,7 +58,7 @@ WHERE expires > UTC_TIMESTAMP() ORDER BY created DESC LIMIT 10`
 
 	for rows.Next() {
 		ss := &models.Snippet{}
-		err := rows.Scan(&ss.ID, &ss.Title, &ss.Content, &ss.Created, &ss.Created, &ss.Expires)
+		err := rows.Scan(&ss.ID, &ss.Title, &ss.Content, &ss.Created, &ss.Expires)
 		if err != nil {
 			return nil, err
 		}

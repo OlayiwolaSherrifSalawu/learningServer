@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,32 +12,32 @@ import (
 
 func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 
-	files := []string{
-		"ui/html/home.page.tmpl",
-		"ui/html/base.layout.tmpl",
-		"ui/html/footer.partail.tmpl",
-	}
+	// files := []string{
+	// 	"ui/html/home.page.tmpl",
+	// 	"ui/html/base.layout.tmpl",
+	// 	"ui/html/footer.partail.tmpl",
+	// }
 
-	ts, err := template.ParseFiles(files...)
+	// ts, err := template.ParseFiles(files...)
 
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// 	return
+	// }
 
-	err = ts.Execute(w, nil)
+	// err = ts.Execute(w, nil)
 
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// 	return
+	// }
 
 	if r.URL.Path != "/" {
 		app.notFound(w)
 		return
 	}
 
-	late, err := app.snippet.Latest()
+	late,err := app.snippet.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return

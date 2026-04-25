@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -33,14 +34,19 @@ func main() {
 		return
 	}
 	defer db.Close()
+	app.snippet = &mysql.SnippetModel{DB: db}
+
 	serve := &http.Server{
 		Addr:     cfg.Addr,
 		Handler:  mux,
 		ErrorLog: app.ErrorLoger,
 	}
 	app.InfoLogger.Printf("Starting server on %s", cfg.Addr)
-	app.snippet = &mysql.SnippetModel{DB: db}
 	err = serve.ListenAndServe()
+	if errors.Is(err, http.ErrServerClosed) {
+		serve.ErrorLog.Println("server closed")
+		return
+	}
 	serve.ErrorLog.Fatal(err)
 
 }
