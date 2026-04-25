@@ -9,6 +9,7 @@ import (
 
 type SnippetModel struct {
 	DB *sql.DB
+	InsertStmt *sql.Stmt
 }
 
 func (s *SnippetModel) Insert(title, content, expires string) (int, error) {

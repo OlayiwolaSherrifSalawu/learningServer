@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -11,7 +11,10 @@ import (
 )
 
 func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
-
+	if r.URL.Path != "/" {
+		app.notFound(w)
+		return
+	}
 	// files := []string{
 	// 	"ui/html/home.page.tmpl",
 	// 	"ui/html/base.layout.tmpl",
@@ -32,12 +35,7 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	if r.URL.Path != "/" {
-		app.notFound(w)
-		return
-	}
-
-	late,err := app.snippet.Latest()
+	late, err := app.snippet.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -48,7 +46,6 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 }
 func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	log.Println(id, err)
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
@@ -64,8 +61,21 @@ func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
-	fmt.Fprintf(w, "%v", snippet)
+	files := []string{
+		"ui/html/show.page.tmpl",
+		"ui/html/base.layout.tmpl",
+		"ui/html/footer.partail.tmpl",
+	}
+	temples, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = temples.Execute(w, snippet)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 }
 func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
