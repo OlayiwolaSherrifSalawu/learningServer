@@ -1,7 +1,10 @@
 package main
 
-import "alexedwards.net/snippetbox/pkg/models/mysql"
+import (
+	"alexedwards.net/snippetbox/pkg/models"
+)
 
 type templatesData struct {
-	Snippet *mysql.SnippetModel
+	Snippet  *models.Snippet
+	Snippets *[]models.Snippet
 }

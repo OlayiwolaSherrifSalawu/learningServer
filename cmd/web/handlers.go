@@ -61,6 +61,7 @@ func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	data := &templatesData{Snippet: snippet}
 	files := []string{
 		"ui/html/show.page.tmpl",
 		"ui/html/base.layout.tmpl",
@@ -71,7 +72,7 @@ func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	err = temples.Execute(w, snippet)
+	err = temples.Execute(w, data)
 	if err != nil {
 		app.serverError(w, err)
 		return
