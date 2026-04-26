@@ -96,7 +96,7 @@ func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	// w.Write([]byte("Create a new snippet..."))
 }
 
-func cacheTemplate(dir string) (map[string]*template.Template, error) {
+func newCacheTemplate(dir string) (map[string]*template.Template, error) {
 	cache := make(map[string]*template.Template)
 
 	pages, err := filepath.Glob(filepath.Join(dir, "*.page.tmpl"))

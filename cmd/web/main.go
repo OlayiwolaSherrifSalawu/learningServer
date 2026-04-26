@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -18,15 +19,15 @@ type Config struct {
 }
 
 type Application struct {
-	ErrorLoger *log.Logger
-	InfoLogger *log.Logger
-	snippet    *mysql.SnippetModel
+	ErrorLoger    *log.Logger
+	InfoLogger    *log.Logger
+	snippet       *mysql.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
 	cfg := new(Config)
-	app := new(Application)
-	mux, cfg := app.routes(cfg)
+
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MY SQL DSN")
 	flag.Parse()
 	db, err := openDB(*dsn)
@@ -35,8 +36,17 @@ func main() {
 		return
 	}
 	defer db.Close()
-	app.snippet = &mysql.SnippetModel{DB: db}
+	tsCache, err := newCacheTemplate("ui/html")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
+	app := &Application{
+		snippet:       &mysql.SnippetModel{DB: db},
+		templateCache: tsCache,
+	}
+	mux, cfg := app.routes(cfg)
 	serve := &http.Server{
 		Addr:     cfg.Addr,
 		Handler:  mux,

@@ -19,3 +19,7 @@ func (app *Application) clientError(w http.ResponseWriter, status int) {
 func (app *Application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
+
+func (app *Application) render(w http.ResponseWriter, r *http.Request, name string, td *templatesData){
+	
+}
