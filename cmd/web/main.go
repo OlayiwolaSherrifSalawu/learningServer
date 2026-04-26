@@ -16,6 +16,7 @@ type Config struct {
 	Addr       string
 	StaticAddr string
 }
+
 type Application struct {
 	ErrorLoger *log.Logger
 	InfoLogger *log.Logger
