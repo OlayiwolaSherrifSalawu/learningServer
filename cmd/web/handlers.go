@@ -15,33 +15,30 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	// files := []string{
-	// 	"ui/html/home.page.tmpl",
-	// 	"ui/html/base.layout.tmpl",
-	// 	"ui/html/footer.partail.tmpl",
-	// }
+	files := []string{
+		"ui/html/home.page.tmpl",
+		"ui/html/base.layout.tmpl",
+		"ui/html/footer.partail.tmpl",
+	}
 
-	// ts, err := template.ParseFiles(files...)
+	ts, err := template.ParseFiles(files...)
 
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
-
-	// err = ts.Execute(w, nil)
-
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// 	return
-	// }
-
-	late, err := app.snippet.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	for _, val := range late {
-		fmt.Fprintf(w, "%v", val)
+
+	late, err := app.snippet.Latest()
+	data := &templatesData{Snippets: late}
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, data)
+	if err != nil {
+		app.serverError(w, err)
+		return
 	}
 }
 func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {

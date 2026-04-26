@@ -6,5 +6,5 @@ import (
 
 type templatesData struct {
 	Snippet  *models.Snippet
-	Snippets *[]models.Snippet
+	Snippets []*models.Snippet
 }
