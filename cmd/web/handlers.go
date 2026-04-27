@@ -16,18 +16,6 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	files := []string{
-		"ui/html/home.page.tmpl",
-		"ui/html/base.layout.tmpl",
-		"ui/html/footer.partail.tmpl",
-	}
-
-	ts, err := template.ParseFiles(files...)
-
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
 
 	late, err := app.snippet.Latest()
 	data := &templatesData{Snippets: late}
@@ -36,11 +24,7 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.Execute(w, data)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	app.render(w, r, "home.page.tmpl", data)
 }
 func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -60,21 +44,8 @@ func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := &templatesData{Snippet: snippet}
-	files := []string{
-		"ui/html/show.page.tmpl",
-		"ui/html/base.layout.tmpl",
-		"ui/html/footer.partail.tmpl",
-	}
-	temples, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	err = temples.Execute(w, data)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	app.render(w, r, "show.page.tmpl", data)
+	
 }
 func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
