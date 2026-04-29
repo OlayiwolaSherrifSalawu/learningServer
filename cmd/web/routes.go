@@ -17,5 +17,5 @@ func (app *Application) routes(cfg *Config) (http.Handler, *Config) {
 	mux.HandleFunc("/snippet", app.ShowSnippet)
 	mux.HandleFunc("/snippet/create", app.CreateSnippet)
 	mux.Handle("/ui/static/", http.StripPrefix("/ui/static/", fileServer))
-	return app.logRequest(secureHeaders(mux)), cfg
+	return app.recoverOnPanic(app.logRequest(secureHeaders(mux))), cfg
 }
