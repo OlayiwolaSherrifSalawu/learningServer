@@ -46,18 +46,24 @@ func (app *Application) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 
 }
 func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
-	title := "Ola test"
-	content := "Afang at night "
-	expires := "3"
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	expires := r.PostForm.Get("expires")
 
 	id, err := app.snippet.Insert(title, content, expires)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 	// w.Write([]byte("Create a new snippet..."))
 }
 func (app *Application) CreateSnippetForm(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Create a new snippet..."))
+	app.render(w, r, "create.page.tmpl", nil)
 }
