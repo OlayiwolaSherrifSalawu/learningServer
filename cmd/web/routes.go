@@ -19,6 +19,9 @@ func (app *Application) routes(cfg *Config) (http.Handler, *Config) {
 
 	mux := pat.New()
 	mux.Get("/", http.HandlerFunc(app.Home))
-	mux.Handle("/ui/static/", http.StripPrefix("/ui/static/", fileServer))
+	mux.Get("/snippet/create", http.HandlerFunc(app.CreateSnippetForm))
+	mux.Get("/snippet/create", http.HandlerFunc(app.CreateSnippet))
+	mux.Get("/snippet/:id", http.HandlerFunc(app.ShowSnippet))
+	mux.Get("/ui/static/", http.StripPrefix("/ui/static/", fileServer))
 	return standardMid.Then(mux), cfg
 }
