@@ -1,8 +1,10 @@
 package forms
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
+	"unicode/utf8"
 )
 
 type Form struct {
@@ -34,7 +36,20 @@ func (f *Form) MaxLength(field string, d int) {
 	if value == "" {
 		return
 	}
-	if len(value) > d {
-		f.Error.Add(value, "content is too long.")
+	if utf8.RuneCountInString(value) > d {
+		f.Error.Add(value, fmt.Sprintf("The length of text is too long maximum length is %d", d))
 	}
+}
+
+func (f *Form) PermittedValues(field string, opts ...string) {
+	value := f.Get(field)
+	if value == "" {
+		return
+	}
+	for _, opt := range opts {
+		if value == opt {
+			return
+		}
+	}
+	f.Error.Add(field, "This field is invalid")
 }
