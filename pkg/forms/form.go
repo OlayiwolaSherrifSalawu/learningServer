@@ -9,7 +9,7 @@ import (
 
 type Form struct {
 	url.Values
-	Error errors
+	Errors errors
 }
 
 func NewForm(data url.Values) *Form {
@@ -26,7 +26,7 @@ func (f *Form) Required(fields ...string) {
 			return
 		}
 		if strings.TrimSpace(value) == "" {
-			f.Error.Add(value, "This Field is required it cant be empty")
+			f.Errors.Add(value, "This Field is required it cant be empty")
 		}
 	}
 }
@@ -37,7 +37,7 @@ func (f *Form) MaxLength(field string, d int) {
 		return
 	}
 	if utf8.RuneCountInString(value) > d {
-		f.Error.Add(value, fmt.Sprintf("The length of text is too long maximum length is %d", d))
+		f.Errors.Add(value, fmt.Sprintf("The length of text is too long maximum length is %d", d))
 	}
 }
 
@@ -51,9 +51,9 @@ func (f *Form) PermittedValues(field string, opts ...string) {
 			return
 		}
 	}
-	f.Error.Add(field, "This field is invalid")
+	f.Errors.Add(field, "This field is invalid")
 }
 
 func (f *Form) Valid() bool {
-	return len(f.Error) == 0
+	return len(f.Errors) == 0
 }

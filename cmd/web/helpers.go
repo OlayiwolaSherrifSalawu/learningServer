@@ -43,7 +43,6 @@ func (app *Application) addDefaultData(td *templatesData, r *http.Request) *temp
 	if td == nil {
 		td = &templatesData{}
 	}
-
 	td.CurrentYear = time.Now().Year()
 	return td
 }

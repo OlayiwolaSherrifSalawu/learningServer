@@ -53,10 +53,20 @@ func (app *Application) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
+
+	title := r.FormValue("title")
+
+	if title == "" {
+		http.Error(w, "title cannot be empty!", http.StatusBadRequest)
+		return
+	}
+
 	formss := forms.NewForm(r.PostForm)
+
 	formss.Required("title", "content", "expires")
 	formss.PermittedValues("expires", "1", "7", "365")
 	formss.MaxLength("title", 100)
+
 	// Initialize a map to hold any validation errors.
 	if !formss.Valid() {
 		app.render(w, r, "create.page.tmpl", &templatesData{
